@@ -6,10 +6,15 @@ int Window::width;
 int Window::height;
 const char* Window::windowTitle = "GLFW Starter Project";
 
+// Skybox initialization
+Skybox * Window::skybox;
+unsigned int Window::skyboxTexture;
+
 // Objects to Render
-Cube * Window::cube;
-PointCloud * Window::cubePoints;
 Object* currObj;
+
+// Track key pressed
+KeyRecord Window::keyPressed;
 
 // Camera Matrices 
 // Projection matrix:
@@ -22,16 +27,18 @@ glm::vec3 Window::upVector(0, 1, 0);		// The up direction of the camera.
 glm::mat4 Window::view = glm::lookAt(Window::eyePos, Window::lookAtPoint, Window::upVector);
 
 // Shader Program ID
-GLuint Window::shaderProgram; 
+GLuint Window::phongShader; 
+GLuint Window::skyboxShader;
 
 
 
 bool Window::initializeProgram() {
 	// Create a shader program with a vertex shader and a fragment shader.
-	shaderProgram = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
+	phongShader = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
+	skyboxShader = LoadShaders("shaders/skybox.vert", "shaders/skybox.frag");
 
 	// Check the shader program.
-	if (!shaderProgram)
+	if (!phongShader || !skyboxShader)
 	{
 		std::cerr << "Failed to initialize shader program" << std::endl;
 		return false;
@@ -42,14 +49,19 @@ bool Window::initializeProgram() {
 
 bool Window::initializeObjects()
 {
-	// Create a cube of size 5.
-	cube = new Cube(5.0f);
+	std::vector<std::string> faces =
+	{
+		"skybox/Skybox_Water222_right.jpg",
+		"skybox/Skybox_Water222_left.jpg",
+		"skybox/Skybox_Water222_top.jpg",
+		"skybox/Skybox_Water222_base.jpg",
+		"skybox/Skybox_Water222_front.jpg",
+		"skybox/Skybox_Water222_back.jpg"
+	};
 
-	// Create a point cloud consisting of cube vertices.
-	cubePoints = new PointCloud("foo", 100);
-
-	// Set cube to be the first to display
-	currObj = cube;
+	// load skybox
+	skybox = new Skybox(500.0f);
+	skyboxTexture = skybox->loadCubemap(faces);
 
 	return true;
 }
@@ -57,11 +69,11 @@ bool Window::initializeObjects()
 void Window::cleanUp()
 {
 	// Deallcoate the objects.
-	delete cube;
-	delete cubePoints;
+	delete skybox;
 
 	// Delete the shader program.
-	glDeleteProgram(shaderProgram);
+	glDeleteProgram(phongShader);
+	glDeleteProgram(skyboxShader);
 }
 
 GLFWwindow* Window::createWindow(int width, int height)
@@ -141,7 +153,6 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height)
 void Window::idleCallback()
 {
 	// Perform any necessary updates here 
-	currObj->update();
 }
 
 void Window::displayCallback(GLFWwindow* window)
@@ -149,8 +160,14 @@ void Window::displayCallback(GLFWwindow* window)
 	// Clear the color and depth buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
+	// Move according to key pressed
+	movement();
+	
+	// Render the skybox
+	skybox->draw(view, projection, skyboxShader);
+
 	// Render the objects
-	currObj->draw(view, projection, shaderProgram);
+	// currObj->draw(view, projection, phongShader);
 
 	// Gets events, including input such as keyboard and mouse or window resizing
 	glfwPollEvents();
@@ -166,7 +183,7 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 	 */
 	
 	// Check for a key press.
-	if (action == GLFW_PRESS)
+	if (action == GLFW_PRESS || action == GLFW_REPEAT)
 	{
 		switch (key)
 		{
@@ -175,16 +192,67 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 			glfwSetWindowShouldClose(window, GL_TRUE);				
 			break;
 
-		// switch between the cube and the cube pointCloud
-		case GLFW_KEY_1:
-			currObj = cube;
+		case GLFW_KEY_Q:
+			keyPressed.qPressed = true;
 			break;
-		case GLFW_KEY_2:
-			currObj = cubePoints;
+
+		case GLFW_KEY_E:
+			keyPressed.ePressed = true;
+			break;
+
+		case GLFW_KEY_W:
+			keyPressed.wPressed = true;
+			break;
+
+		case GLFW_KEY_A:
+			keyPressed.aPressed = true;
+			break;
+
+		case GLFW_KEY_S:
+			keyPressed.sPressed = true;
+			break;
+
+		case GLFW_KEY_D:
+			keyPressed.dPressed = true;
 			break;
 
 		default:
 			break;
 		}
+	}
+
+	else {
+		keyPressed.qPressed = false;
+		keyPressed.ePressed = false;
+		keyPressed.wPressed = false;
+		keyPressed.aPressed = false;
+		keyPressed.sPressed = false;
+		keyPressed.dPressed = false;
+	}
+}
+
+void Window::movement() {
+	if (keyPressed.qPressed) {
+            view = glm::rotate(glm::mat4(1), glm::radians(-1.0f), glm::vec3(0, 1, 0)) * view;
+	}
+
+	if (keyPressed.ePressed) {
+            view = glm::rotate(glm::mat4(1), glm::radians(1.0f), glm::vec3(0, 1, 0)) * view;
+	}
+
+	if (keyPressed.wPressed) {
+		eyePos = eyePos + glm::vec3(0, 0, 1);
+	}
+
+	if (keyPressed.aPressed) {
+		eyePos = eyePos + glm::vec3(1, 0, 0);
+	}
+
+	if (keyPressed.sPressed) {
+		eyePos = eyePos + glm::vec3(0, 0, -1);
+	}
+
+	if (keyPressed.dPressed) {
+		eyePos = eyePos + glm::vec3(-1, 0, 0);
 	}
 }

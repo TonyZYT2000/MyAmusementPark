@@ -5,7 +5,16 @@
 #include "shader.h"
 #include "Object.h"
 #include "Cube.h"
-#include "PointCloud.h"
+#include "Skybox.h"
+
+struct KeyRecord {
+	bool qPressed;
+	bool ePressed;
+	bool wPressed;
+	bool aPressed;
+	bool sPressed;
+	bool dPressed;
+};
 
 class Window
 {
@@ -17,8 +26,8 @@ public:
 	static const char* windowTitle;
 
 	// Objects to Render
-	static Cube* cube;
-	static PointCloud * cubePoints;
+	static Skybox* skybox;
+	static unsigned int skyboxTexture;
 
 	// Camera Matrices
 	static glm::mat4 projection;
@@ -26,7 +35,8 @@ public:
 	static glm::vec3 eyePos, lookAtPoint, upVector;
 
 	// Shader Program ID
-	static GLuint shaderProgram;
+	static GLuint phongShader;
+	static GLuint skyboxShader;
 
 	// Constructors and Destructors
 	static bool initializeProgram();
@@ -43,6 +53,10 @@ public:
 
 	// Callbacks
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+private:
+	static KeyRecord keyPressed;
+	static void movement();
 };
 
 #endif
