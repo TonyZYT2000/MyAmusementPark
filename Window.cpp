@@ -257,13 +257,13 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 
 void Window::movement() {
 	if (keyPressed.qPressed) {
-		glm::mat4 leftRotate = glm::rotate(glm::mat4(1), glm::radians(0.5f), upVector);
-		lookAtPoint = eyePos + glm::vec3(leftRotate * glm::vec4(lookAtPoint - eyePos, 0));
-            skyboxView = glm::inverse(leftRotate) * skyboxView;
+		glm::mat4 rotate = glm::rotate(glm::mat4(1), glm::radians(0.5f), upVector);
+		lookAtPoint = eyePos + glm::vec3(rotate * glm::vec4(lookAtPoint - eyePos, 0));
+            skyboxView = glm::inverse(rotate) * skyboxView;
 	} else if (keyPressed.ePressed) {
-		glm::mat4 rightRotate = glm::rotate(glm::mat4(1), glm::radians(-0.5f), upVector);
-		lookAtPoint = eyePos + glm::vec3(rightRotate * glm::vec4(lookAtPoint - eyePos, 0));
-            skyboxView = glm::inverse(rightRotate) * skyboxView;
+		glm::mat4 rotate = glm::rotate(glm::mat4(1), glm::radians(-0.5f), upVector);
+		lookAtPoint = eyePos + glm::vec3(rotate * glm::vec4(lookAtPoint - eyePos, 0));
+            skyboxView = glm::inverse(rotate) * skyboxView;
 	}
 
 	if (keyPressed.wPressed) {
