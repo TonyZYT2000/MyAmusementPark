@@ -11,7 +11,7 @@ Skybox * Window::skybox;
 unsigned int Window::skyboxTexture;
 
 // Objects to Render
-Object* currObj;
+Sphere* Window::disco;
 
 // Track key pressed
 KeyRecord Window::keyPressed;
@@ -25,20 +25,23 @@ glm::vec3 Window::eyePos(0, 0, 20);			// Camera position.
 glm::vec3 Window::lookAtPoint(0, 0, 0);		// The point we are looking at.
 glm::vec3 Window::upVector(0, 1, 0);		// The up direction of the camera.
 glm::mat4 Window::view = glm::lookAt(Window::eyePos, Window::lookAtPoint, Window::upVector);
+glm::mat4 Window::skyboxView = glm::lookAt(Window::eyePos, Window::lookAtPoint, Window::upVector);
+
+float Window::speed = 1;
 
 // Shader Program ID
 GLuint Window::phongShader; 
 GLuint Window::skyboxShader;
-
-
+GLuint Window::envmapShader;
 
 bool Window::initializeProgram() {
 	// Create a shader program with a vertex shader and a fragment shader.
 	phongShader = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
 	skyboxShader = LoadShaders("shaders/skybox.vert", "shaders/skybox.frag");
+	envmapShader = LoadShaders("shaders/envmap.vert", "shaders/envmap.frag");
 
 	// Check the shader program.
-	if (!phongShader || !skyboxShader)
+	if (!phongShader || !skyboxShader || !envmapShader)
 	{
 		std::cerr << "Failed to initialize shader program" << std::endl;
 		return false;
@@ -49,6 +52,7 @@ bool Window::initializeProgram() {
 
 bool Window::initializeObjects()
 {
+	/*
 	std::vector<std::string> faces =
 	{
 		"skybox/Skybox_Water222_right.jpg",
@@ -58,10 +62,24 @@ bool Window::initializeObjects()
 		"skybox/Skybox_Water222_front.jpg",
 		"skybox/Skybox_Water222_back.jpg"
 	};
+	*/
+
+	std::vector<std::string> faces =
+	{
+		"skybox/right.jpg",
+		"skybox/left.jpg",
+		"skybox/top.jpg",
+		"skybox/bottom.jpg",
+		"skybox/front.jpg",
+		"skybox/back.jpg"
+	};
 
 	// load skybox
 	skybox = new Skybox(500.0f);
 	skyboxTexture = skybox->loadCubemap(faces);
+
+	// load disco
+	disco = new Sphere(5.0f);
 
 	return true;
 }
@@ -74,6 +92,7 @@ void Window::cleanUp()
 	// Delete the shader program.
 	glDeleteProgram(phongShader);
 	glDeleteProgram(skyboxShader);
+	glDeleteProgram(envmapShader);
 }
 
 GLFWwindow* Window::createWindow(int width, int height)
@@ -150,9 +169,13 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height)
 								double(width) / (double)height, 1.0, 1000.0);
 }
 
+// Perform any necessary updates here 
 void Window::idleCallback()
 {
-	// Perform any necessary updates here 
+	// Move according to key pressed
+	movement();
+	// disco->update();
+	// std::cerr << eyePos.x << ", " << eyePos.y << ", " << eyePos.z << std::endl;
 }
 
 void Window::displayCallback(GLFWwindow* window)
@@ -160,11 +183,16 @@ void Window::displayCallback(GLFWwindow* window)
 	// Clear the color and depth buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
-	// Move according to key pressed
-	movement();
 	
 	// Render the skybox
-	skybox->draw(view, projection, skyboxShader);
+	skybox->draw(skyboxView, projection, skyboxShader);
+
+	// Render the disco ball
+	// Use env map shader
+	glUseProgram(envmapShader);
+	glUniform3fv(glGetUniformLocation(envmapShader, "eyePos"), 1, glm::value_ptr(Window::eyePos));
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+	disco->draw(view, projection, envmapShader);
 
 	// Render the objects
 	// currObj->draw(view, projection, phongShader);
@@ -178,10 +206,6 @@ void Window::displayCallback(GLFWwindow* window)
 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	/*
-	 * TODO: Modify below to add your key callbacks.
-	 */
-	
 	// Check for a key press.
 	if (action == GLFW_PRESS || action == GLFW_REPEAT)
 	{
@@ -233,26 +257,38 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 
 void Window::movement() {
 	if (keyPressed.qPressed) {
-            view = glm::rotate(glm::mat4(1), glm::radians(-1.0f), glm::vec3(0, 1, 0)) * view;
-	}
-
-	if (keyPressed.ePressed) {
-            view = glm::rotate(glm::mat4(1), glm::radians(1.0f), glm::vec3(0, 1, 0)) * view;
+		glm::mat4 leftRotate = glm::rotate(glm::mat4(1), glm::radians(0.5f), upVector);
+		lookAtPoint = eyePos + glm::vec3(leftRotate * glm::vec4(lookAtPoint - eyePos, 0));
+            skyboxView = glm::inverse(leftRotate) * skyboxView;
+	} else if (keyPressed.ePressed) {
+		glm::mat4 rightRotate = glm::rotate(glm::mat4(1), glm::radians(-0.5f), upVector);
+		lookAtPoint = eyePos + glm::vec3(rightRotate * glm::vec4(lookAtPoint - eyePos, 0));
+            skyboxView = glm::inverse(rightRotate) * skyboxView;
 	}
 
 	if (keyPressed.wPressed) {
-		eyePos = eyePos + glm::vec3(0, 0, 1);
+		glm::vec3 forward = glm::normalize(lookAtPoint - eyePos);
+		lookAtPoint += forward;
+		eyePos += forward;
 	}
 
 	if (keyPressed.aPressed) {
-		eyePos = eyePos + glm::vec3(1, 0, 0);
+		glm::vec3 leftward = glm::normalize(glm::cross(upVector, lookAtPoint - eyePos));
+		lookAtPoint += leftward;
+		eyePos += leftward;
 	}
 
 	if (keyPressed.sPressed) {
-		eyePos = eyePos + glm::vec3(0, 0, -1);
+		glm::vec3 backward = glm::normalize(eyePos - lookAtPoint);
+		lookAtPoint += backward;
+		eyePos += backward;
 	}
 
 	if (keyPressed.dPressed) {
-		eyePos = eyePos + glm::vec3(-1, 0, 0);
+		glm::vec3 rightward = glm::normalize(glm::cross(lookAtPoint - eyePos, upVector));
+		lookAtPoint += rightward;
+		eyePos += rightward;
 	}
+
+      view = glm::lookAt(Window::eyePos, Window::lookAtPoint, Window::upVector);
 }

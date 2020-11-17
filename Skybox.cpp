@@ -143,8 +143,15 @@ unsigned int Skybox::loadCubemap(std::vector<std::string> faces) {
 			stbi_image_free(data);
 		}
 	}
+
+	// No bytes are padded
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	// Bilinear interpolation
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Use clmap to hide edges
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);

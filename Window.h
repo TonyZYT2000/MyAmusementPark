@@ -6,6 +6,7 @@
 #include "Object.h"
 #include "Cube.h"
 #include "Skybox.h"
+#include "Sphere.h"
 
 struct KeyRecord {
 	bool qPressed;
@@ -25,18 +26,23 @@ public:
 	static int height;
 	static const char* windowTitle;
 
-	// Objects to Render
+	// Skybox
 	static Skybox* skybox;
 	static unsigned int skyboxTexture;
+
+	// Objects to Render
+	static Sphere* disco;
 
 	// Camera Matrices
 	static glm::mat4 projection;
 	static glm::mat4 view;
+	static glm::mat4 skyboxView;
 	static glm::vec3 eyePos, lookAtPoint, upVector;
 
 	// Shader Program ID
 	static GLuint phongShader;
 	static GLuint skyboxShader;
+	static GLuint envmapShader;
 
 	// Constructors and Destructors
 	static bool initializeProgram();
@@ -57,6 +63,7 @@ public:
 private:
 	static KeyRecord keyPressed;
 	static void movement();
+	static float speed;
 };
 
 #endif
