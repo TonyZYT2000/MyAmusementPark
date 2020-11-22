@@ -118,6 +118,7 @@ void Sphere::draw(const glm::mat4& view, const glm::mat4& projection, GLuint sha
 	// Get back correct culling
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+
 	// Get the shader variable locations and send the uniform data to the shader 
       glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, false, glm::value_ptr(view));
       glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, false, glm::value_ptr(projection));

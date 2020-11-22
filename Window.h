@@ -7,6 +7,8 @@
 #include "Cube.h"
 #include "Skybox.h"
 #include "Sphere.h"
+#include "Transform.h"
+#include "Geometry.h"
 
 struct KeyRecord {
 	bool qPressed;
@@ -15,6 +17,8 @@ struct KeyRecord {
 	bool aPressed;
 	bool sPressed;
 	bool dPressed;
+	bool ctrlPressed;
+	bool shiftPressed;
 };
 
 class Window
@@ -32,12 +36,17 @@ public:
 
 	// Objects to Render
 	static Sphere* disco;
+	static Transform* world;
 
 	// Camera Matrices
 	static glm::mat4 projection;
 	static glm::mat4 view;
 	static glm::mat4 skyboxView;
 	static glm::vec3 eyePos, lookAtPoint, upVector;
+
+	// Light Source
+	static glm::vec3 lightPos;
+	static glm::vec3 lightColor;
 
 	// Shader Program ID
 	static GLuint phongShader;
@@ -48,6 +57,8 @@ public:
 	static bool initializeProgram();
 	static bool initializeObjects();
 	static void cleanUp();
+
+	static void initializeWorld();
 
 	// Window functions
 	static GLFWwindow* createWindow(int width, int height);
