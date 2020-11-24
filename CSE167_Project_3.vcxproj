@@ -117,6 +117,7 @@
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Sphere.cpp" />
+    <ClCompile Include="SphereNode.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -130,6 +131,7 @@
     <ClInclude Include="shader.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="SphereNode.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Window.h" />

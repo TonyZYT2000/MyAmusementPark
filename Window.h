@@ -9,6 +9,7 @@
 #include "Sphere.h"
 #include "Transform.h"
 #include "Geometry.h"
+#include "SphereNode.h"
 
 struct KeyRecord {
 	bool qPressed;
@@ -35,9 +36,10 @@ public:
 	static unsigned int skyboxTexture;
 
 	// Objects to Render
-	static Sphere* disco;
+	// static Sphere* disco;
 	static Transform* world;
 	static Transform* pillarMove;
+	static SphereNode* discoMove;
 	static std::vector<Transform*> barMove;
 	static std::vector<Transform*> torusAndBarMove;
 	static std::vector<Geometry*> potMove;
