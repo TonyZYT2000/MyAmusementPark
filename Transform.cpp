@@ -37,7 +37,6 @@ void Transform::update() {
       } 
       else if (mode == 3) {
             if (!moveFlag) {
-                  std::cerr << "move moveFlag" << std::endl;
                   transform = glm::translate(glm::vec3(0, 0.3, 0)) * transform;
                   ++counter;
                   if (counter > 0) {
@@ -45,7 +44,6 @@ void Transform::update() {
                   }
             }
             else {
-                  std::cerr << "move down" << std::endl;
                   transform = glm::translate(glm::vec3(0, -0.3, 0)) * transform;
                   --counter;
                   if (counter < -80) {
@@ -62,4 +60,10 @@ void Transform::update() {
 
 void Transform::addChild(Node* child) {
       children.push_back(child);
+}
+
+void Transform::toggleMove() {
+      int temp = mode;
+      mode = modeMem;
+      modeMem = temp;
 }

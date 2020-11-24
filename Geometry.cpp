@@ -222,3 +222,9 @@ void Geometry::update() {
 void Geometry::addChild(Node* child) {
       children.push_back(child);
 }
+
+void Geometry::toggleMove() {
+      int temp = mode;
+      mode = modeMem;
+      modeMem = temp;
+}

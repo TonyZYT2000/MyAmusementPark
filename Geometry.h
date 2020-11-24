@@ -13,6 +13,7 @@ class Geometry : public Node
 {
 private:
 	int mode;
+	int modeMem = 0;
 	glm::mat4 model;
 	std::vector<glm::vec3> points;
 	std::vector<glm::vec3> normals;
@@ -31,6 +32,7 @@ public:
 	void draw(const glm::mat4& C, GLuint shader);
 	void update();
 	void addChild(Node* child);
+	void toggleMove();
 };
 
 #endif

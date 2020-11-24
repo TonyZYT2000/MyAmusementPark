@@ -37,6 +37,10 @@ public:
 	// Objects to Render
 	static Sphere* disco;
 	static Transform* world;
+	static Transform* pillarMove;
+	static std::vector<Transform*> barMove;
+	static std::vector<Transform*> torusAndBarMove;
+	static std::vector<Geometry*> potMove;
 
 	// Camera Matrices
 	static glm::mat4 projection;
@@ -71,7 +75,6 @@ public:
 	// Callbacks
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-private:
 	static KeyRecord keyPressed;
 	static void movement();
 	static float speed;

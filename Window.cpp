@@ -13,6 +13,10 @@ unsigned int Window::skyboxTexture;
 // Objects to Render
 Sphere* Window::disco;
 Transform* Window::world;
+Transform* Window::pillarMove;
+std::vector<Transform*> Window::barMove;
+std::vector<Transform*> Window::torusAndBarMove;
+std::vector<Geometry*> Window::potMove;
 
 // Track key pressed
 KeyRecord Window::keyPressed;
@@ -97,12 +101,17 @@ void Window::initializeWorld() {
 	Transform* worldToLand = new Transform(glm::translate(glm::vec3(0, -30, 100)), 0);
 	Geometry* land = new Geometry("models/land.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.6, 0.4, 0.3), glm::vec3(0.5, 0.4, 0.4), glm::vec3(200, 1, 200), 0);
 	Transform* landToPillar = new Transform(glm::translate(glm::vec3(0, 20, 0)), 1);
+	pillarMove = landToPillar;
 
-	Geometry* pillar = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0, 0.6, 0.9), glm::vec3(0, 0.7, 0.8), glm::vec3(1, 50, 1), 0);
+	Geometry* pillar = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0, 0.6, 0.9), glm::vec3(0, 0, 0), glm::vec3(3, 50, 3), 0);
 	Transform* pillarToBar1 = new Transform(glm::translate(glm::vec3(0, 30, 0)) * glm::rotate(glm::radians(60.0f), glm::vec3(0, 0, 1)), 2);
 	Transform* pillarToBar2 = new Transform(glm::translate(glm::vec3(0, 30, 0)) * glm::rotate(glm::radians(60.0f), glm::vec3(1, 0, 0)), 2);
 	Transform* pillarToBar3 = new Transform(glm::translate(glm::vec3(0, 30, 0)) * glm::rotate(glm::radians(60.0f), glm::vec3(0, 0, -1)), 2);
 	Transform* pillarToBar4 = new Transform(glm::translate(glm::vec3(0, 30, 0)) * glm::rotate(glm::radians(60.0f), glm::vec3(-1, 0, 0)), 2);
+	barMove.push_back(pillarToBar1);
+	barMove.push_back(pillarToBar2);
+	barMove.push_back(pillarToBar3);
+	barMove.push_back(pillarToBar4);
 
 	Geometry* bar1 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.8, 0.3, 0.9), glm::vec3(0.9, 0.5, 0.8), glm::vec3(1, 50, 1), 0);
 	Geometry* bar2 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.4, 0.9, 0.8), glm::vec3(0.3, 0.8, 0.9), glm::vec3(1, 50, 1), 0);
@@ -117,6 +126,14 @@ void Window::initializeWorld() {
 	Transform* bar3ToTorusBar = new Transform(glm::translate(glm::vec3(0, 50, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)), 3);
 	Transform* bar4ToTorus = new Transform(glm::translate(glm::vec3(0, 50, 0)), 3);
 	Transform* bar4ToTorusBar = new Transform(glm::translate(glm::vec3(0, 50, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)), 3);
+	torusAndBarMove.push_back(bar1ToTorus);
+	torusAndBarMove.push_back(bar1ToTorusBar);
+	torusAndBarMove.push_back(bar2ToTorus);
+	torusAndBarMove.push_back(bar2ToTorusBar);
+	torusAndBarMove.push_back(bar3ToTorus);
+	torusAndBarMove.push_back(bar3ToTorusBar);
+	torusAndBarMove.push_back(bar4ToTorus);
+	torusAndBarMove.push_back(bar4ToTorusBar);
 
 	Geometry* torus1 = new Geometry("models/torus_hr.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), glm::vec3(1), glm::vec3(10, 5, 10), 0);
 	Geometry* torusBar1 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), glm::vec3(1), glm::vec3(1, 10, 1), 0);
@@ -135,6 +152,10 @@ void Window::initializeWorld() {
 	Geometry* pot3 = new Geometry("models/teapot.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.3, 0.5, 0.5), glm::vec3(0.7, 0.8, 0.9), glm::vec3(0.2), 1);
 	Transform* bar4ToPot = new Transform(glm::translate(glm::vec3(0, -50, 0)) * glm::rotate(glm::radians(-60.0f), glm::vec3(-1, 0, 0)), 0);
 	Geometry* pot4 = new Geometry("models/teapot.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.3, 0.5, 0.5), glm::vec3(0.7, 0.8, 0.9), glm::vec3(0.2), 2);
+	potMove.push_back(pot1);
+	potMove.push_back(pot2);
+	potMove.push_back(pot3);
+	potMove.push_back(pot4);
 
 	world->addChild(worldToLand);
 	worldToLand->addChild(land);
@@ -349,6 +370,25 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 
 		case GLFW_KEY_LEFT_SHIFT:
 			keyPressed.shiftPressed = true;
+			break;
+
+		case GLFW_KEY_1:
+			pillarMove->toggleMove();
+			break;
+
+		case GLFW_KEY_2:
+			for (auto move : barMove) {
+				move->toggleMove();
+			}
+			break;
+
+		case GLFW_KEY_3:
+			for (auto move : torusAndBarMove) {
+				move->toggleMove();
+			}
+			for (auto move : potMove) {
+				move->toggleMove();
+			}
 			break;
 
 		default:

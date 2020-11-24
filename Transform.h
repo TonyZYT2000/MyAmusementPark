@@ -9,6 +9,7 @@ class Transform : public Node
 {
 private:
 	int mode;
+	int modeMem = 0;
 	bool moveFlag = true;
 	int counter = 0;
 	glm::mat4 transform;
@@ -20,6 +21,7 @@ public:
 	void draw(const glm::mat4& C, GLuint shader);
 	void update();
 	void addChild(Node* child);
+	void toggleMove();
 };
 
 #endif
