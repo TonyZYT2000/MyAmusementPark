@@ -12,8 +12,6 @@
 class SphereNode : public Node
 {
 private:
-	int mode = 1;
-	int modeMem = 0;
 	GLuint VAO;
 	GLuint VBO, EBO, NBO;
 	int stackCount = 40;
@@ -30,7 +28,6 @@ public:
 	void draw(const glm::mat4& C, GLuint shader);
 	void update();
 	void addChild(Node* child);
-	void toggleMove();
 };
 
 #endif

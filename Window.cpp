@@ -14,7 +14,7 @@ unsigned int Window::skyboxTexture;
 //Sphere* Window::disco;
 Transform* Window::world;
 Transform* Window::pillarMove;
-SphereNode* Window::discoMove;
+Transform* Window::discoMove;
 std::vector<Transform*> Window::barMove;
 std::vector<Transform*> Window::torusAndBarMove;
 std::vector<Geometry*> Window::potMove;
@@ -110,9 +110,9 @@ void Window::initializeWorld() {
 	pillarMove = landToPillar;
 
 	// pillar to disco
-	Transform* pillarToDisco = new Transform(glm::translate(glm::vec3(0, 50, 0)), 0);
-	SphereNode* disco = new SphereNode(5.0f, envmapShader);
-	discoMove = disco;
+	Transform* pillarToDisco = new Transform(glm::translate(glm::vec3(0, 50, 0)), 2);
+	SphereNode* disco = new SphereNode(6.0f, envmapShader);
+	discoMove = pillarToDisco;
 
 	// pillar to bar
 	Transform* pillarToBar1 = new Transform(glm::translate(glm::vec3(0, 30, 0)) * glm::rotate(glm::radians(60.0f), glm::vec3(0, 0, 1)), 2);

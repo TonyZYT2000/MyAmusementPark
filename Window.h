@@ -39,7 +39,7 @@ public:
 	// static Sphere* disco;
 	static Transform* world;
 	static Transform* pillarMove;
-	static SphereNode* discoMove;
+	static Transform* discoMove;
 	static std::vector<Transform*> barMove;
 	static std::vector<Transform*> torusAndBarMove;
 	static std::vector<Geometry*> potMove;

@@ -139,17 +139,10 @@ void SphereNode::draw(const glm::mat4& C, GLuint shader) {
 }
 
 void SphereNode::update() {
-      if (mode == 1) {
-            model = model * glm::rotate(glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-      }
+      return;
 }
 
 void SphereNode::addChild(Node* child) {
       children.push_back(child);
 }
 
-void SphereNode::toggleMove() {
-      int temp = mode;
-      mode = modeMem;
-      modeMem = temp;
-}
