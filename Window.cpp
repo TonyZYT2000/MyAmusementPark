@@ -1,6 +1,5 @@
 #include "Window.h"
 
-
 // Window Properties
 int Window::width;
 int Window::height;
@@ -17,7 +16,7 @@ Transform* Window::pillarMove;
 Transform* Window::discoMove;
 std::vector<Transform*> Window::barMove;
 std::vector<Transform*> Window::torusAndBarMove;
-std::vector<Geometry*> Window::potMove;
+std::vector<Transform*> Window::potMove;
 
 // Track key pressed
 KeyRecord Window::keyPressed;
@@ -74,6 +73,7 @@ bool Window::initializeObjects()
 	};
 	*/
 
+	// load faces for skybox
 	std::vector<std::string> faces =
 	{
 		"skybox/right.jpg",
@@ -84,12 +84,9 @@ bool Window::initializeObjects()
 		"skybox/back.jpg"
 	};
 
-	// load skybox
+	// build skybox
 	skybox = new Skybox(500.0f);
 	skyboxTexture = skybox->loadCubemap(faces);
-
-	// load disco
-	// disco = new Sphere(5.0f);
 
 	// initialize scene graph of the ride
 	initializeWorld();
@@ -101,17 +98,18 @@ void Window::initializeWorld() {
 	world = new Transform(glm::mat4(1), 0);
 	// world to land
 	Transform* worldToLand = new Transform(glm::translate(glm::vec3(0, -30, 100)), 0);
-	Geometry* land = new Geometry("models/land.obj", glm::vec3(0.12, 0.08, 0.07), glm::vec3(0.6, 0.4, 0.3), glm::vec3(0.5, 0.4, 0.4), glm::vec3(200, 1, 200), 0);
+	Geometry* land = new Geometry("models/land.obj", glm::vec3(0.12, 0.08, 0.07), glm::vec3(0.6, 0.4, 0.3), glm::vec3(0.5, 0.4, 0.4), glm::vec3(200, 1, 200));
 
 	// world to pillar
 	Transform* landToPillar = new Transform(glm::translate(glm::vec3(0, 20, 0)), 1);
-	Geometry* pillar = new Geometry("models/cylinder.obj", glm::vec3(0.02, 0.1, 0.15), glm::vec3(0, 0.6, 0.9), glm::vec3(0, 0, 0), glm::vec3(3, 50, 3), 0);
+	Geometry* pillar = new Geometry("models/cylinder.obj", glm::vec3(0.02, 0.1, 0.15), glm::vec3(0, 0.6, 0.9), glm::vec3(0, 0, 0), glm::vec3(3, 50, 3));
 	// level 1 movement control
 	pillarMove = landToPillar;
 
 	// pillar to disco
 	Transform* pillarToDisco = new Transform(glm::translate(glm::vec3(0, 50, 0)), 2);
 	SphereNode* disco = new SphereNode(6.0f, envmapShader);
+	// level 2 movement control
 	discoMove = pillarToDisco;
 
 	// pillar to bar
@@ -125,10 +123,10 @@ void Window::initializeWorld() {
 	barMove.push_back(pillarToBar3);
 	barMove.push_back(pillarToBar4);
 	// bars
-	Geometry* bar1 = new Geometry("models/cylinder.obj", glm::vec3(0.12, 0.05, 0.15), glm::vec3(0.8, 0.3, 0.9), glm::vec3(0.9, 0.5, 0.8), glm::vec3(1, 50, 1), 0);
-	Geometry* bar2 = new Geometry("models/cylinder.obj", glm::vec3(0.06, 0.15, 0.12), glm::vec3(0.4, 0.9, 0.8), glm::vec3(0.3, 0.8, 0.9), glm::vec3(1, 50, 1), 0);
-	Geometry* bar3 = new Geometry("models/cylinder.obj", glm::vec3(0.15, 0.08, 0.08), glm::vec3(0.9, 0.3, 0.3), glm::vec3(0.9, 0.1, 0.1), glm::vec3(1, 50, 1), 0);
-	Geometry* bar4 = new Geometry("models/cylinder.obj", glm::vec3(0.02, 0.15, 0.05), glm::vec3(0.1, 0.9, 0.2), glm::vec3(0.1, 0.8, 0.1), glm::vec3(1, 50, 1), 0);
+	Geometry* bar1 = new Geometry("models/cylinder.obj", glm::vec3(0.12, 0.05, 0.15), glm::vec3(0.8, 0.3, 0.9), glm::vec3(0.9, 0.5, 0.8), glm::vec3(1, 50, 1));
+	Geometry* bar2 = new Geometry("models/cylinder.obj", glm::vec3(0.06, 0.15, 0.12), glm::vec3(0.4, 0.9, 0.8), glm::vec3(0.3, 0.8, 0.9), glm::vec3(1, 50, 1));
+	Geometry* bar3 = new Geometry("models/cylinder.obj", glm::vec3(0.15, 0.08, 0.08), glm::vec3(0.9, 0.3, 0.3), glm::vec3(0.9, 0.1, 0.1), glm::vec3(1, 50, 1));
+	Geometry* bar4 = new Geometry("models/cylinder.obj", glm::vec3(0.02, 0.15, 0.05), glm::vec3(0.1, 0.9, 0.2), glm::vec3(0.1, 0.8, 0.1), glm::vec3(1, 50, 1));
 
 	// bar to cone (as the cover of the hole)
 	Transform* bar1ToCone = new Transform(glm::translate(glm::vec3(0, 52, 0)), 0);
@@ -136,20 +134,20 @@ void Window::initializeWorld() {
 	Transform* bar3ToCone = new Transform(glm::translate(glm::vec3(0, 52, 0)), 0);
 	Transform* bar4ToCone = new Transform(glm::translate(glm::vec3(0, 52, 0)), 0);
 	// cones
-	Geometry* cone1 = new Geometry("models/cone.obj", glm::vec3(0.12, 0.05, 0.15), glm::vec3(0.8, 0.3, 0.9), glm::vec3(0.9, 0.5, 0.8), glm::vec3(0.45, 1, 0.45), 0);
-	Geometry* cone2 = new Geometry("models/cone.obj", glm::vec3(0.06, 0.15, 0.12), glm::vec3(0.4, 0.9, 0.8), glm::vec3(0.3, 0.8, 0.9), glm::vec3(0.45, 1, 0.45), 0);
-	Geometry* cone3 = new Geometry("models/cone.obj", glm::vec3(0.15, 0.08, 0.08), glm::vec3(0.9, 0.3, 0.3), glm::vec3(0.9, 0.1, 0.1), glm::vec3(0.45, 1, 0.45), 0);
-	Geometry* cone4 = new Geometry("models/cone.obj", glm::vec3(0.02, 0.15, 0.05), glm::vec3(0.1, 0.9, 0.2), glm::vec3(0.1, 0.8, 0.1), glm::vec3(0.45, 1, 0.45), 0);
+	Geometry* cone1 = new Geometry("models/cone.obj", glm::vec3(0.12, 0.05, 0.15), glm::vec3(0.8, 0.3, 0.9), glm::vec3(0.9, 0.5, 0.8), glm::vec3(0.45, 1, 0.45));
+	Geometry* cone2 = new Geometry("models/cone.obj", glm::vec3(0.06, 0.15, 0.12), glm::vec3(0.4, 0.9, 0.8), glm::vec3(0.3, 0.8, 0.9), glm::vec3(0.45, 1, 0.45));
+	Geometry* cone3 = new Geometry("models/cone.obj", glm::vec3(0.15, 0.08, 0.08), glm::vec3(0.9, 0.3, 0.3), glm::vec3(0.9, 0.1, 0.1), glm::vec3(0.45, 1, 0.45));
+	Geometry* cone4 = new Geometry("models/cone.obj", glm::vec3(0.02, 0.15, 0.05), glm::vec3(0.1, 0.9, 0.2), glm::vec3(0.1, 0.8, 0.1), glm::vec3(0.45, 1, 0.45));
 
 	// bar to torus and torus bar
-	Transform* bar1ToTorus = new Transform(glm::translate(glm::vec3(0, 50, 0)), 3);
-	Transform* bar2ToTorus = new Transform(glm::translate(glm::vec3(0, 50, 0)), 3);
-	Transform* bar3ToTorus = new Transform(glm::translate(glm::vec3(0, 50, 0)), 3);
-	Transform* bar4ToTorus = new Transform(glm::translate(glm::vec3(0, 50, 0)), 3);
-	Transform* bar1ToTorusBar = new Transform(glm::translate(glm::vec3(0, 50, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)), 3);
-	Transform* bar2ToTorusBar = new Transform(glm::translate(glm::vec3(0, 50, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)), 3);
-	Transform* bar3ToTorusBar = new Transform(glm::translate(glm::vec3(0, 50, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)), 3);
-	Transform* bar4ToTorusBar = new Transform(glm::translate(glm::vec3(0, 50, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)), 3);
+	Transform* bar1ToTorus = new Transform(glm::translate(glm::vec3(0, 50, 0)), 4);
+	Transform* bar2ToTorus = new Transform(glm::translate(glm::vec3(0, 50, 0)), 4);
+	Transform* bar3ToTorus = new Transform(glm::translate(glm::vec3(0, 50, 0)), 4);
+	Transform* bar4ToTorus = new Transform(glm::translate(glm::vec3(0, 50, 0)), 4);
+	Transform* bar1ToTorusBar = new Transform(glm::translate(glm::vec3(0, 50, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)), 4);
+	Transform* bar2ToTorusBar = new Transform(glm::translate(glm::vec3(0, 50, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)), 4);
+	Transform* bar3ToTorusBar = new Transform(glm::translate(glm::vec3(0, 50, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)), 4);
+	Transform* bar4ToTorusBar = new Transform(glm::translate(glm::vec3(0, 50, 0)) * glm::rotate(glm::radians(90.0f), glm::vec3(0, 0, 1)), 4);
 	// level 3 movement control
 	torusAndBarMove.push_back(bar1ToTorus);
 	torusAndBarMove.push_back(bar1ToTorusBar);
@@ -160,30 +158,34 @@ void Window::initializeWorld() {
 	torusAndBarMove.push_back(bar4ToTorus);
 	torusAndBarMove.push_back(bar4ToTorusBar);
 	// toruses and torus bars
-	Geometry* torus1 = new Geometry("models/torus_hr.obj", glm::vec3(0.1, 0.1, 0.05), glm::vec3(0), glm::vec3(0.99, 0.96, 0.6), glm::vec3(10, 5, 10), 0);
-	Geometry* torus2 = new Geometry("models/torus_hr.obj", glm::vec3(0.05, 0.1, 0.1), glm::vec3(0), glm::vec3(0.6, 0.96, 0.99), glm::vec3(10, 5, 10), 0);
-	Geometry* torus3 = new Geometry("models/torus_hr.obj", glm::vec3(0.1, 0.1, 0.05), glm::vec3(0), glm::vec3(0.99, 0.96, 0.6), glm::vec3(10, 5, 10), 0);
-	Geometry* torus4 = new Geometry("models/torus_hr.obj", glm::vec3(0.05, 0.1, 0.1), glm::vec3(0), glm::vec3(0.6, 0.96, 0.99), glm::vec3(10, 5, 10), 0);
-	Geometry* torusBar1 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), glm::vec3(1), glm::vec3(1, 10, 1), 0);
-	Geometry* torusBar2 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), glm::vec3(1), glm::vec3(1, 10, 1), 0);
-	Geometry* torusBar3 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), glm::vec3(1), glm::vec3(1, 10, 1), 0);
-	Geometry* torusBar4 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), glm::vec3(1), glm::vec3(1, 10, 1), 0);
+	Geometry* torus1 = new Geometry("models/torus_hr.obj", glm::vec3(0.1, 0.1, 0.05), glm::vec3(0), glm::vec3(0.99, 0.96, 0.6), glm::vec3(10, 5, 10));
+	Geometry* torus2 = new Geometry("models/torus_hr.obj", glm::vec3(0.05, 0.1, 0.1), glm::vec3(0), glm::vec3(0.6, 0.96, 0.99), glm::vec3(10, 5, 10));
+	Geometry* torus3 = new Geometry("models/torus_hr.obj", glm::vec3(0.1, 0.1, 0.05), glm::vec3(0), glm::vec3(0.99, 0.96, 0.6), glm::vec3(10, 5, 10));
+	Geometry* torus4 = new Geometry("models/torus_hr.obj", glm::vec3(0.05, 0.1, 0.1), glm::vec3(0), glm::vec3(0.6, 0.96, 0.99), glm::vec3(10, 5, 10));
+	Geometry* torusBar1 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), glm::vec3(1), glm::vec3(1, 10, 1));
+	Geometry* torusBar2 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), glm::vec3(1), glm::vec3(1, 10, 1));
+	Geometry* torusBar3 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), glm::vec3(1), glm::vec3(1, 10, 1));
+	Geometry* torusBar4 = new Geometry("models/cylinder.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0), glm::vec3(1), glm::vec3(1, 10, 1));
 
 	// bar to pot
 	Transform* bar1ToPot = new Transform(glm::translate(glm::vec3(0, -50, 0)) * glm::rotate(glm::radians(-60.0f), glm::vec3(0, 0, 1)), 0);
 	Transform* bar2ToPot = new Transform(glm::translate(glm::vec3(0, -50, 0)) * glm::rotate(glm::radians(-60.0f), glm::vec3(1, 0, 0)), 0);
 	Transform* bar3ToPot = new Transform(glm::translate(glm::vec3(0, -50, 0)) * glm::rotate(glm::radians(-60.0f), glm::vec3(0, 0, -1)), 0);
 	Transform* bar4ToPot = new Transform(glm::translate(glm::vec3(0, -50, 0)) * glm::rotate(glm::radians(-60.0f), glm::vec3(-1, 0, 0)), 0);
+	Transform* animePot1 = new Transform(glm::mat4(1), 2);
+	Transform* animePot2 = new Transform(glm::mat4(1), 3);
+	Transform* animePot3 = new Transform(glm::mat4(1), 2);
+	Transform* animePot4 = new Transform(glm::mat4(1), 3);
+	// level 3 movement control
+	potMove.push_back(animePot1);
+	potMove.push_back(animePot2);
+	potMove.push_back(animePot3);
+	potMove.push_back(animePot4);
 	// pots
-	Geometry* pot1 = new Geometry("models/teapot.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.3, 0.5, 0.5), glm::vec3(0.7, 0.8, 0.9), glm::vec3(0.2), 1);
-	Geometry* pot2 = new Geometry("models/teapot.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.3, 0.5, 0.5), glm::vec3(0.7, 0.8, 0.9), glm::vec3(0.2), 2);
-	Geometry* pot3 = new Geometry("models/teapot.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.3, 0.5, 0.5), glm::vec3(0.7, 0.8, 0.9), glm::vec3(0.2), 1);
-	Geometry* pot4 = new Geometry("models/teapot.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.3, 0.5, 0.5), glm::vec3(0.7, 0.8, 0.9), glm::vec3(0.2), 2);
-	// level 3 movement control, geometry self rotation
-	potMove.push_back(pot1);
-	potMove.push_back(pot2);
-	potMove.push_back(pot3);
-	potMove.push_back(pot4);
+	Geometry* pot1 = new Geometry("models/teapot.obj", glm::vec3(0.06, 0.1, 0.1), glm::vec3(0.3, 0.5, 0.5), glm::vec3(0.7, 0.8, 0.9), glm::vec3(0.2));
+	Geometry* pot2 = new Geometry("models/teapot.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.6, 0.2, 0.2), glm::vec3(0.9, 0.7, 0.7), glm::vec3(0.2));
+	Geometry* pot3 = new Geometry("models/teapot.obj", glm::vec3(0.06, 0.1, 0.1), glm::vec3(0.3, 0.5, 0.5), glm::vec3(0.7, 0.8, 0.9), glm::vec3(0.2));
+	Geometry* pot4 = new Geometry("models/teapot.obj", glm::vec3(0.1, 0.1, 0.1), glm::vec3(0.6, 0.2, 0.2), glm::vec3(0.9, 0.7, 0.7), glm::vec3(0.2));
 
 	// add land and pillar
 	world->addChild(worldToLand);
@@ -238,18 +240,23 @@ void Window::initializeWorld() {
 
 	// add pots
 	bar1->addChild(bar1ToPot);
-	bar1ToPot->addChild(pot1);
+	bar1ToPot->addChild(animePot1);
+	animePot1->addChild(pot1);
 	bar2->addChild(bar2ToPot);
-	bar2ToPot->addChild(pot2);
+	bar2ToPot->addChild(animePot2);
+	animePot2->addChild(pot2);
 	bar3->addChild(bar3ToPot);
-	bar3ToPot->addChild(pot3);
+	bar3ToPot->addChild(animePot3);
+	animePot3->addChild(pot3);
 	bar4->addChild(bar4ToPot);
-	bar4ToPot->addChild(pot4);
+	bar4ToPot->addChild(animePot4);
+	animePot4->addChild(pot4);
 }
 void Window::cleanUp()
 {
 	// Deallcoate the objects.
 	delete skybox;
+	delete world;
 
 	// Delete the shader program.
 	glDeleteProgram(phongShader);
@@ -336,7 +343,7 @@ void Window::idleCallback()
 {
 	// Move according to key pressed
 	movement();
-	// disco->update();
+	// update all objects in scene graph
 	world->update();
 }
 
@@ -345,18 +352,15 @@ void Window::displayCallback(GLFWwindow* window)
 	// Clear the color and depth buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
-	
 	// Render the skybox
 	skybox->draw(skyboxView, projection, skyboxShader);
 
-	// Render the disco ball
-	// Use env map shader
+	// Setup envmap shader for disco ball
 	glUseProgram(envmapShader);
 	glUniformMatrix4fv(glGetUniformLocation(envmapShader, "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(envmapShader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glUniform3fv(glGetUniformLocation(envmapShader, "eyePos"), 1, glm::value_ptr(Window::eyePos));
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-	// disco->draw(view, projection, envmapShader);
 
 	// Render the objects
 	glUseProgram(phongShader);
@@ -365,6 +369,7 @@ void Window::displayCallback(GLFWwindow* window)
 	glUniform3fv(glGetUniformLocation(phongShader, "eyePos"), 1, glm::value_ptr(eyePos));
 	glUniform3fv(glGetUniformLocation(phongShader, "lightPos"), 1, glm::value_ptr(lightPos));
 	glUniform3fv(glGetUniformLocation(phongShader, "lightColor"), 1, glm::value_ptr(lightColor));
+	// call draw on scene graph
 	world->draw(glm::mat4(1), phongShader);
 
 	// Gets events, including input such as keyboard and mouse or window resizing
@@ -418,10 +423,12 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 			keyPressed.shiftPressed = true;
 			break;
 
+		// level 1 movement
 		case GLFW_KEY_1:
 			pillarMove->toggleMove();
 			break;
 
+		// level 2 movement
 		case GLFW_KEY_2:
 			for (auto move : barMove) {
 				move->toggleMove();
@@ -429,6 +436,7 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 			discoMove->toggleMove();
 			break;
 
+		// level 3 movement
 		case GLFW_KEY_3:
 			for (auto move : torusAndBarMove) {
 				move->toggleMove();
@@ -455,6 +463,7 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 	}
 }
 
+// control key movement
 void Window::movement() {
 	if (keyPressed.qPressed) {
 		glm::mat4 rotate = glm::rotate(glm::mat4(1), glm::radians(0.5f), upVector);

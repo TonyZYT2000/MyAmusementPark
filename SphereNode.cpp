@@ -139,7 +139,9 @@ void SphereNode::draw(const glm::mat4& C, GLuint shader) {
 }
 
 void SphereNode::update() {
-      return;
+      for (auto child : children) {
+            child->update();
+      }
 }
 
 void SphereNode::addChild(Node* child) {

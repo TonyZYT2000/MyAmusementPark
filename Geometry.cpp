@@ -1,7 +1,7 @@
 #include "Geometry.h"
 
-Geometry::Geometry(std::string objFilename, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 scale, int updateMode) : 
-	kAmbient(amb), kDiffuse(diff), kSpecular(spec), mode(updateMode) {
+Geometry::Geometry(std::string objFilename, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 scale) : 
+	kAmbient(amb), kDiffuse(diff), kSpecular(spec) {
 	// parsing vertex, vertex normal and faces
 	std::ifstream objFile(objFilename);
 
@@ -207,13 +207,6 @@ void Geometry::draw(const glm::mat4& C, GLuint shader) {
 }
 
 void Geometry::update() {
-	if (mode == 1) {
-		model = glm::rotate(glm::radians(0.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model;
-	}
-	else if (mode == 2) {
-		model = glm::rotate(glm::radians(-1.5f), glm::vec3(0.0f, 1.0f, 0.0f)) * model;
-	}
-
 	for (auto child : children) {
 		child->update();
 	}
@@ -221,10 +214,4 @@ void Geometry::update() {
 
 void Geometry::addChild(Node* child) {
       children.push_back(child);
-}
-
-void Geometry::toggleMove() {
-      int temp = mode;
-      mode = modeMem;
-      modeMem = temp;
 }

@@ -35,14 +35,15 @@ public:
 	static Skybox* skybox;
 	static unsigned int skyboxTexture;
 
-	// Objects to Render
-	// static Sphere* disco;
+	// Root of scene graph, world
 	static Transform* world;
+
+	// Key Transform node that control animation
 	static Transform* pillarMove;
 	static Transform* discoMove;
 	static std::vector<Transform*> barMove;
 	static std::vector<Transform*> torusAndBarMove;
-	static std::vector<Geometry*> potMove;
+	static std::vector<Transform*> potMove;
 
 	// Camera Matrices
 	static glm::mat4 projection;

@@ -12,8 +12,6 @@
 class Geometry : public Node
 {
 private:
-	int mode;
-	int modeMem = 0;
 	glm::mat4 model;
 	std::vector<glm::vec3> points;
 	std::vector<glm::vec3> normals;
@@ -27,12 +25,11 @@ private:
 	std::list<Node*> children;
 
 public:
-	Geometry(std::string objFilename, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 scale, int updateMode);
+	Geometry(std::string objFilename, glm::vec3 amb, glm::vec3 diff, glm::vec3 spec, glm::vec3 scale);
 	~Geometry();
 	void draw(const glm::mat4& C, GLuint shader);
 	void update();
 	void addChild(Node* child);
-	void toggleMove();
 };
 
 #endif
