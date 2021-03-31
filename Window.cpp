@@ -3,7 +3,7 @@
 // Window Properties
 int Window::width;
 int Window::height;
-const char* Window::windowTitle = "GLFW Starter Project";
+const char* Window::windowTitle = "CSE167 Project 3";
 
 // Skybox initialization
 Skybox * Window::skybox;
