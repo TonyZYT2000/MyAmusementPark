@@ -1,4 +1,4 @@
-# CSE167 Project 3
+# My Amusement Park
 
 ## Description
 
